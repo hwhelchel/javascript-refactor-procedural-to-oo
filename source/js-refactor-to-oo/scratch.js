@@ -1,22 +1,3 @@
-$(function(){
-
-  var eventStarters = {
-    diceStarter: '#roller button.add',
-    rollStarter: '#roller button.roll'
-  };
-
-  DiceApp.view = new DiceApp.View({
-      diceBucket: '.dice',
-      dieMarker:  '.die',
-      die: '<div class="die">0</div>',
-      messageToLog: 'WAT',
-      eventStarters: eventStarters
-  });
-
-  DiceApp.controller = new DiceApp.Controller({ view: DiceApp.view });
-  new DiceApp.Binder(eventStarters, DiceApp.controller).bind();
-});
-
 // name spacing App so we only have one global.
 var DiceApp = {};
 
@@ -29,7 +10,9 @@ DiceApp.View.prototype = {
   update: function(dataSource){
     this.showDice(dataSource);
     if (dataSource.dice) {
-      this.showRoll(dataSource);
+      for (var die in dataSource.dice) {
+        this.showRoll(die);
+      }
       this.printOut(dataSource);
     }
   },
@@ -39,8 +22,8 @@ DiceApp.View.prototype = {
   showDice: function(dataSource){
     $(this.config.diceBucket).append(this.config.die);
   },
-  showRoll: function(dataSource){
-    $(this.config.dieMarker).text(value);
+  showRoll: function(die){
+    $(this.config.dieDisplay).text(die.value);
   }
 };
 
@@ -73,7 +56,7 @@ DiceApp.Binder.prototype = {
     sel = this.targets.diceStarter;
 
     $(sel).click(function(){
-      controller.diceMaker();
+      controller.diceControl();
     });
   },
   bindRollMaker: function(){
@@ -81,7 +64,54 @@ DiceApp.Binder.prototype = {
     sel = this.targets.rollStarter;
 
     $(sel).click(function(){
-      controller.rollMaker();
+      controller.rollControl();
     });
   }
 };
+
+
+//CEO
+DiceApp.Controller = function(config){
+  this.view = config.view;
+  this.dice = [];
+};
+
+DiceApp.Controller.prototype = {
+  diceControl: function(){
+    this.makeDie();
+    this.view.update(this);
+  },
+  rollControl: function(){
+    this.makeRolls();
+    this.view.update(this);
+  },
+  makeDie: function(){
+    console.log(this.dice);
+    this.dice.push(new DiceApp.Die(6));
+  },
+  makeRolls: function(){
+    for (var die in this.dice)
+    {
+      die.roll();
+    }
+  }
+};
+
+$(function(){
+
+  var eventStarters = {
+    diceStarter: '#roller button.add',
+    rollStarter: '#roller button.roll'
+  };
+
+  DiceApp.view = new DiceApp.View({
+      diceBucket: '.dice',
+      dieDisplay:  '.die',
+      die: '<div class="die">0</div>',
+      messageToLog: 'WAT',
+      eventStarters: eventStarters
+  });
+
+  DiceApp.controller = new DiceApp.Controller({ view: DiceApp.view });
+  new DiceApp.Binder(eventStarters, DiceApp.controller).bind();
+});

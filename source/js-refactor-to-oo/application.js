@@ -18,28 +18,3 @@ $(document).ready(function() {
     });
   });
 });
-
-//CEO
-DiceApp.Controller = function(config){
-  this.view = config.view;
-};
-
-DiceApp.Controller.prototype = {
-  diceMaker: function(){
-    this.makeDie();
-    this.view.update(this);
-  },
-  rollMaker: function(){
-    this.makeRolls();
-    this.view.update(this);
-  },
-  makeDie: function(){
-    this.dice.push(new Die(6));
-  },
-  makeRolls: function(){
-    for (var die in this.dice)
-    {
-      die.roll();
-    }
-  }
-};
